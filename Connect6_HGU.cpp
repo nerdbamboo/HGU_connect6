@@ -9,7 +9,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 
-#include <Python.h>
+// #include </Users/38a/anaconda3/include/python3.10/Python.h>
 
 #include "Connect6Algo.h"
 
@@ -68,17 +68,17 @@ int showBoard(int x, int y) {
 }
 
 void printBoard(){ // 바둑판 출력
-    for(int i = -2; i < width + 1; i++){
-        if(i <= 0) printf(" ");
-        else if(i < 10) printf("%d ", i);
-        else printf("%d", i);
-    }
-    printf("\n   ---------------------------------------\n");
+    // for(int i = -2; i < width + 1; i++){
+    //     if(i <= 0) printf(" ");
+    //     else if(i < 10) printf("%d ", i);
+    //     else printf("%d", i);
+    // }
+    // printf("\n   ---------------------------------------\n");
     for (int i = 0; i < width; i++) {
-        if(i < 9)
-            printf("%d |", i+1);
-        else
-            printf("%d|", i+1);
+        // if(i < 9)
+        //     printf("%d |", i+1);
+        // else
+        //     printf("%d|", i+1);
 		for (int j = 0; j < height; j++) {
 		    printf("%d ", board[i][j]);
 		}
@@ -94,20 +94,14 @@ int main() {
     int turn = 1, gameEnd = 0;
     //printf("Who First? 1 : AI, 0 : you\n");
     //scanf("%d", &turn);
-	PyObject* pArgs, * pInput;
-	Py_Initialize();
-	pArgs = PyTuple_New(2);
 
     for(int i = 0; i < 4; i++){
-        int x = rand()%19;
-        int y = rand()%19;
+        int x, y;
+		printf("Enter the blocking location : ");
+		scanf("%d %d", &x, &y);
         printf("blocked [%d, %d]\n", x, y);
-        block(x, y);
+        block(x-1, y-1);
     }
-    PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append(r'/Users/smcho/Documents/git/QT_co6')");
-
-	pInput = PyUnicode_FromString("board"); 
 
     printBoard();
     while(!gameEnd){
@@ -176,4 +170,3 @@ void block(int x, int y) {
 		board[x][y] = 3;
 	}
 }
-
