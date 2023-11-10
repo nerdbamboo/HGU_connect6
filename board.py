@@ -99,6 +99,9 @@ def main():
     moveX = []
     moveY = []
 
+    selfMoveX = []
+    selfMoveY = []
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

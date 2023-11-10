@@ -104,6 +104,8 @@ void mymove(int x[], int y[], int cnt) {
             printf("ERROR 이미 돌이 있는 위치입니다. MY[%d, %d]", x[i], y[i]);
 		}
 	}
+	if(cnt == 2)
+		RenewalMytMoves(x[0], x[1], y[0], y[1]);
 }
 
 void opmove(int x[], int y[], int cnt) {

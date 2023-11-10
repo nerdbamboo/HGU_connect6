@@ -19,6 +19,7 @@ extern void domymove(int x[], int y[], int cnt = 2);
 
 int myturn(int cnt = 2);
 void RenewalOpponentMoves(int x0, int x1, int y0, int y1);
+void RenewalMytMoves(int x0, int x1, int y0, int y1);
 extern char info[];
 
 //bool Is_Conn6(int myBoard[][19], MOVES myMove, int player);

@@ -55,6 +55,10 @@ MOVES CurrentMyMoves = { { 9, 9 },{ -1, -1 } }; // opmove가 실행된 후 상�
 void RenewalOpponentMoves(int x0, int x1, int y0, int y1) {
 	CurrentOpponentMoves = { {x0, y0}, {x1, y1} };
 }
+
+void RenewalMytMoves(int x0, int x1, int y0, int y1) {
+	CurrentMyMoves = { {x0, y0}, {x1, y1} };
+}
 //(x, y)가 보드 내에 위치하는지 아닌지 확인하는 함수
 bool IsOutOfBounds(int x, int y) {
 	if (0 <= x && x < BOARD_ROW && 0 <= y && y < BOARD_COL)
