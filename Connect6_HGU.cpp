@@ -3,15 +3,18 @@
 // <--------------- 이 Code를 수정하면  작동하지 않을 수 있습니다 ------------------>
 
 //#include <Windows.h>
+#include<bits/stdc++.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
+using namespace std;
 
 // #include </Users/38a/anaconda3/include/python3.10/Python.h>
 
 #include "Connect6Algo.h"
+#include <nlohmann/json.hpp>
 
 unsigned s_time;
 int terminateAI;
@@ -86,43 +89,16 @@ void printBoard(){ // 바둑판 출력
 	}
 }
 int main() {
-	// myturn = 인공지능이
-    // opturn = 사람 or 상대 인공지능
-    printf("********************** Connect6! **********************\n\n");
     init();
-    cnt = 1;
-    int turn = 1, gameEnd = 0;
-    //printf("Who First? 1 : AI, 0 : you\n");
-    //scanf("%d", &turn);
 
-    for(int i = 0; i < 4; i++){
-        int x, y;
-		printf("Enter the blocking location : ");
-		scanf("%d %d", &x, &y);
-        printf("blocked [%d, %d]\n", x, y);
-        block(x-1, y-1);
-    }
+	nlohmann::json input;
+    cin >> input;
 
-    printBoard();
-    while(!gameEnd){
-        if(turn){
-            gameEnd = myturn(cnt);
-            if(cnt == 1) cnt = 2;
-            turn = !turn;
-        }
-        else{
-            int x[2], y[2];
-            printf("input: ");
-            scanf("%d %d %d %d", &x[0], &y[0], &x[1], &y[1]);
-            for(int i = 0; i < 2; i++){
-                x[i]--;
-                y[i]--;
-            }
-            opmove(x, y, 2);
-            turn = !turn;
-        }
-        printBoard();
-    }
+	for(int i=0; i<BOARD_SIZE; i++) 
+		for(int j=0; j<BOARD_SIZE; j++)
+			board[i][j] = input[i][j].get<int>();
+
+	int gameEnd = myturn(1);
 
 	return 0;
 }
@@ -144,7 +120,7 @@ void mymove(int x[], int y[], int cnt) {
 	for (int i = 0; i < cnt; i++) {
 		if (isFree(x[i], y[i])) {
 			board[x[i]][y[i]] = 1;
-            printf("AI[%d, %d] cnt: %d\n", x[i] + 1, y[i] + 1, cnt);
+            printf("%d %d\n", x[i] + 1, y[i] + 1);
 		}
 		else {
             printf("ERROR 이미 돌이 있는 위치입니다. MY[%d, %d]", x[i], y[i]);
