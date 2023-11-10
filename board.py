@@ -27,7 +27,7 @@ red_stone = pygame.transform.scale(red_stone, (size, size))
 #상하좌우 여백 크기
 margin = 20
 
-board = [[0 for j in range(GRID_WIDTH)] for i in range(GRID_HEIGHT)]
+board = [[0 for j in range(19)] for i in range(19)]
 
 def draw_board(screen):
     screen.fill(BROWN)
@@ -91,7 +91,8 @@ def main():
                     row = round(x / GRID_SIZE)
                     col = round(y / GRID_SIZE)
                     screen.blit(red_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
-                    board[col][row] = 3
+                    # print(col-1, row-1)
+                    board[col-1][row-1] = 3
                     red_cnt += 1
         pygame.display.flip()
     
@@ -106,43 +107,43 @@ def main():
                 if margin < x < WINDOW_WIDTH - margin and margin < y < WINDOW_HEIGHT - margin:
                     row = round(x / GRID_SIZE)
                     col = round(y / GRID_SIZE)
-                    if board[row][col] == 0:
+                    if board[col-1][row-1] == 0:
                         # 돌 놓기 (검은 돌과 흰 돌 번갈아가며 놓기)
                         if is_black_turn:  # is_black_turn 변수를 정의해야 합니다.
                             input_data = json.dumps(board) # 배열을 JSON 문자열로 변환
                             result = subprocess.run(['./play'], input=input_data.encode(), stdout=subprocess.PIPE)
-                            output = result.stdout.decode()
-                            print("C++ 프로그램의 출력 결과:", output)
+                            # output = result.stdout.decode()
+                            # print("C++ 프로그램의 출력 결과:", output)
                             output = result.stdout.decode().strip().split()
                             row = float(output[0])
                             col = float(output[1])
-                            print(int(row))
-                            print(int(col))
+                            # print(int(row))
+                            # print(int(col))
                             screen.blit(black_stone, (col * GRID_SIZE - (size/2), row * GRID_SIZE - (size/2)))
                             board[int(row)-1][int(col)-1] = 1
                             
                             row = float(output[2])
                             col = float(output[3])
-                            print(int(row))
-                            print(int(col))
+                            # print(int(row))
+                            # print(int(col))
                             screen.blit(black_stone, (col * GRID_SIZE - (size/2), row * GRID_SIZE - (size/2)))
                             board[int(row)-1][int(col)-1] = 1
                             
                             # check debugging
-                            for i in range(19):
-                                for j in range(19):
-                                    print(board[i][j], end = " ")
-                                print()
+                            # for i in range(19):
+                            #     for j in range(19):
+                            #         print(board[i][j], end = " ")
+                            #     print()
                         else:
                             print(f"클릭한 위치: Row {col}, Col {row}")
                             screen.blit(white_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
                             board[col-1][row-1] = 2
                             
                             # check debugging
-                            for i in range(19):
-                                for j in range(19):
-                                    print(board[i][j], end = " ")
-                                print()
+                            # for i in range(19):
+                            #     for j in range(19):
+                            #         print(board[i][j], end = " ")
+                            #     print()
                         
                         if cnt == 2:
                             is_black_turn = not is_black_turn
