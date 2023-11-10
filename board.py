@@ -1,5 +1,7 @@
 import pygame
 import sys
+import subprocess
+import json
 
 GRID_SIZE = 40
 STONE_SIZE = 36
@@ -82,7 +84,7 @@ def main():
                     row = round(x / GRID_SIZE)
                     col = round(y / GRID_SIZE)
                     screen.blit(red_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
-                    board[row][col] = 3
+                    board[col][row] = 3
                     red_cnt += 1
         pygame.display.flip()
     
@@ -98,15 +100,27 @@ def main():
                     row = round(x / GRID_SIZE)
                     col = round(y / GRID_SIZE)
                     if board[row][col] == 0:
-                        print(f"클릭한 위치: Row {col}, Col {row}")
-
-                    # 돌 놓기 (검은 돌과 흰 돌 번갈아가며 놓기)
+                        # 돌 놓기 (검은 돌과 흰 돌 번갈아가며 놓기)
                         if is_black_turn:  # is_black_turn 변수를 정의해야 합니다.
+                            print(f"클릭한 위치: Row {col}, Col {row}")
                             screen.blit(black_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
-                            board[row][col] = 1
+                            board[row-1][col-1] = 1
                         else:
+                            input_data = json.dumps(board) # 배열을 JSON 문자열로 변환
+                            result = subprocess.run(['./play'], input=input_data.encode(), stdout=subprocess.PIPE)
+                            output = result.stdout.decode().strip().split()
+                            row = float(output[0])
+                            col = float(output[1])
+                            print(row)
+                            print(col)
                             screen.blit(white_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
-                            board[row][col] = 2
+                            board[int(row)][int(col)] = 2
+                            
+                            # check debugging
+                            for i in range(20):
+                                for j in range(20):
+                                    print(board[i][j], end = " ")
+                                print()
                         
                         if cnt == 2:
                             is_black_turn = not is_black_turn
