@@ -1,7 +1,3 @@
-// Samsung Go Tournament Form C Connect6Algo (g++-4.8.3)
-
-// <--------------- 이 Code를 수정하면  작동하지 않을 수 있습니다 ------------------>
-
 //#include <Windows.h>
 #include<bits/stdc++.h>
 #include <stdio.h>
@@ -11,7 +7,6 @@
 #include <ctype.h>
 using namespace std;
 
-// #include </Users/38a/anaconda3/include/python3.10/Python.h>
 
 #include "Connect6Algo.h"
 #include <nlohmann/json.hpp>
@@ -22,48 +17,12 @@ int width = 19, height = 19;
 int cnt = 2;
 int myColor;
 
-static char cmd[256];
-//static HANDLE event1, event2;
 #define BOARD_SIZE 20
 int board[BOARD_SIZE][BOARD_SIZE];
 
-static void getLine() {
-	int c, bytes;
-
-	bytes = 0;
-	do {
-		c = getchar();
-		if (c == EOF) exit(0);
-		if (bytes < sizeof(cmd)) cmd[bytes++] = (char)c;
-	} while (c != '\n');
-	cmd[bytes - 1] = 0;
-	if (cmd[bytes - 2] == '\r') cmd[bytes - 2] = 0;
-}
-
-int setLine(char *fmt, ...) {
-	int i;
-	va_list va;
-	va_start(va, fmt);
-	i = vprintf(fmt, va);
-	putchar('\n');
-	fflush(stdout);
-	va_end(va);
-	return i;
-}
-
-static const char *getParam(const char *command, const char *input) {
-	int n1, n2;
-	n1 = (int)strlen(command);
-	n2 = (int)strlen(input);
-	//if (n1 > n2 || _strnicmp(command, input, n1)) return NULL;
-	input += strlen(command);
-	while (isspace(input[0])) input++;	
-	return input;
-}
-
 
 void domymove(int x[], int y[], int cnt) {
-	mymove(x, y, cnt);
+		mymove(x, y, cnt);
 }
 
 int showBoard(int x, int y) {
@@ -90,32 +49,32 @@ void printBoard(){ // 바둑판 출력
 }
 
 int main() {
-    init();
+    //init();
 
-	nlohmann::json input;
-    cin >> input;
+	nlohmann::json input, moveX, moveY;
+    cin >> input >> moveX >> moveY;
 
-	int prev[BOARD_SIZE][BOARD_SIZE];
+	//int prev[BOARD_SIZE][BOARD_SIZE];
 	int x[2], y[2];
-	int cmp = 0;
-	for(int i=0; i<19; i++) {
-		for(int j=0; j<19; j++) {
-			prev[i][j] = board[i][j];
+	//int cmp = 0;
+	for(int i = 0; i < 19; i++) {
+		for(int j = 0; j < 19; j++) {
+			//prev[i][j] = board[i][j];
 			board[i][j] = input[i][j].get<int>();
-			if(prev[i][j] != board[i][j] && board[i][j] == 2) {
-				// cout << "prev : " << prev[i][j] << " board : " << board[i][j] << "\n";
-				// cout << i << " " << j << "\n";
-				if(cmp < 2) {
-					x[cmp] = i;
-					y[cmp] = j;
-					// cout << i << " " << j << "\n";
-				}
-				cmp++;
-			}
+			// if(prev[i][j] != board[i][j] && board[i][j] == 2) {
+			// 	if(cmp < 2) {
+			// 		x[cmp] = i;
+			// 		y[cmp] = j;
+			// 	}
+			// 	cmp++;
+			// }
 		}
 	}
-
-	if(cmp == 2) opmove(x, y, 2);
+	for(int i = 0; i < 2; i++){
+		x[i] = moveX[i];
+		y[i] = moveY[i];
+	}
+ 	opmove(x, y, 2);
 	int gameEnd = myturn(2);
 
 	return 0;
@@ -147,14 +106,14 @@ void mymove(int x[], int y[], int cnt) {
 }
 
 void opmove(int x[], int y[], int cnt) {
-	for (int i = 0; i < cnt; i++) {
-		if (isFree(x[i], y[i])) {
-			board[x[i]][y[i]] = 2;
-		}
-		else {
-            // printf("ERROR 이미 돌이 있는 위치입니다. OP[%d, %d]", x[i], y[i]);
-		}
-	}
+	// for (int i = 0; i < cnt; i++) {
+	// 	if (isFree(x[i], y[i])) {
+	// 		board[x[i]][y[i]] = 2;
+	// 	}
+	// 	else {
+    //         printf("ERROR 이미 돌이 있는 위치입니다. OP[%d, %d]", x[i], y[i]);
+	// 	}
+	// }
 	if(cnt == 2) // 상대가 두 수를 착수했을 경우에만
 		RenewalOpponentMoves(x[0], x[1], y[0], y[1]); // 상대방의 착수를 갱신
 }

@@ -583,7 +583,7 @@ int myturn(int cnt) {
 	// 필수 함수 : domymove(x배열,y배열,배열크기)
 	// 여기서 배열크기(cnt)는 myturn()의 파라미터 cnt를 그대로 넣어야합니다.
 	domymove(x, y, cnt);
-	if(Is_Conn6(myBoard, {{x[0], y[0]}, {x[1], y[1]}}, 1)){
+	if(Is_Conn6(myBoard, {{x[0], y[0]}, {x[1], y[1]}}, 1) == true){
 		printf("HA HA HA\n");
 		return 1;
 	}
