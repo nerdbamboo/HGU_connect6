@@ -68,14 +68,21 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("바둑판")
-    is_black_turn = True
+    is_black_turn = False
     running = True
     draw_board(screen)
-    cnt = 2
+    cnt = 1
     
+    # Setting blokcing location
     red_cnt = 0
     while True:
         if(red_cnt == 4):
+            # Setting first black_stone
+            row = 10
+            col = 10
+            screen.blit(black_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
+            board[col-1][row-1] = 1
+            pygame.display.flip()
             break
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -102,30 +109,49 @@ def main():
                     if board[row][col] == 0:
                         # 돌 놓기 (검은 돌과 흰 돌 번갈아가며 놓기)
                         if is_black_turn:  # is_black_turn 변수를 정의해야 합니다.
-                            print(f"클릭한 위치: Row {col}, Col {row}")
-                            screen.blit(black_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
-                            board[row-1][col-1] = 1
-                        else:
                             input_data = json.dumps(board) # 배열을 JSON 문자열로 변환
                             result = subprocess.run(['./play'], input=input_data.encode(), stdout=subprocess.PIPE)
+                            output = result.stdout.decode()
+                            print("C++ 프로그램의 출력 결과:", output)
                             output = result.stdout.decode().strip().split()
                             row = float(output[0])
                             col = float(output[1])
-                            print(row)
-                            print(col)
-                            screen.blit(white_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
-                            board[int(row)][int(col)] = 2
+                            print(int(row))
+                            print(int(col))
+                            screen.blit(black_stone, (col * GRID_SIZE - (size/2), row * GRID_SIZE - (size/2)))
+                            board[int(row)-1][int(col)-1] = 1
+                            
+                            row = float(output[2])
+                            col = float(output[3])
+                            print(int(row))
+                            print(int(col))
+                            screen.blit(black_stone, (col * GRID_SIZE - (size/2), row * GRID_SIZE - (size/2)))
+                            board[int(row)-1][int(col)-1] = 1
                             
                             # check debugging
-                            for i in range(20):
-                                for j in range(20):
+                            for i in range(19):
+                                for j in range(19):
+                                    print(board[i][j], end = " ")
+                                print()
+                        else:
+                            print(f"클릭한 위치: Row {col}, Col {row}")
+                            screen.blit(white_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
+                            board[col-1][row-1] = 2
+                            
+                            # check debugging
+                            for i in range(19):
+                                for j in range(19):
                                     print(board[i][j], end = " ")
                                 print()
                         
                         if cnt == 2:
                             is_black_turn = not is_black_turn
                             cnt = 0
-                        cnt += 1
+                        if is_black_turn:
+                            cnt += 2
+                        else:
+                            cnt += 1
+                
         
         running = check_connect6(board)
         pygame.display.flip()
