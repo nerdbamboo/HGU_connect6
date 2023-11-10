@@ -47,10 +47,10 @@ typedef pair<MOVES, double> MOVES_SCORE;
 // "샘플코드[C]"  -> 자신의 팀명 (수정)
 // "AI부서[C]"  -> 자신의 소속 (수정)
 // 제출시 실행파일은 반드시 팀명으로 제출!
-char info[] = { "TeamName:자본주의가낳은AI,Department:고려대학교" };
+//char info[] = { "TeamName:자본주의가낳은AI,Department:고려대학교" };
 
 MOVES CurrentOpponentMoves = { {-1, -1}, {-1, -1} }; // opmove가 실행된 후 상대방의 착수를 저장하는 변수
-MOVES CurrentMyMoves = { { -1, -1 },{ -1, -1 } }; // opmove가 실행된 후 상대방의 착수를 저장하는 변수
+MOVES CurrentMyMoves = { { 9, 9 },{ -1, -1 } }; // opmove가 실행된 후 상대방의 착수를 저장하는 변수
 
 void RenewalOpponentMoves(int x0, int x1, int y0, int y1) {
 	CurrentOpponentMoves = { {x0, y0}, {x1, y1} };
@@ -370,19 +370,20 @@ double Get_ScoreOfDoubleMoves(int myBoard[][BOARD_COL], MOVES myMoves, int playe
 
 // 최선의 수를 반환(한개짜리)
 POSITION Find_BestSingleMove(int myBoard[][BOARD_COL], int player) {
-	double maxscore = -1.0;
-	POSITION bestmove = { -1, -1 };
-	for (int x = 0; x < BOARD_ROW; x++) {
-		for (int y = 0; y < BOARD_COL; y++) {
-			if (myBoard[x][y] != EMPTY)
-				continue;
-			double tmpScore = Get_ScoreOfSingleMove(myBoard, { x, y }, player);
-			if (tmpScore >= maxscore && abs(BOARD_ROW / 2 - x) + abs(BOARD_COL / 2 - y) < abs(BOARD_ROW / 2 - bestmove.X) + abs(BOARD_COL / 2 - bestmove.Y)) {
-				bestmove = { x, y };
-				maxscore = tmpScore;
-			}
-		}
-	}
+	// double maxscore = -1.0;
+	// POSITION bestmove = { -1, -1 };
+	// for (int x = 0; x < BOARD_ROW; x++) {
+	// 	for (int y = 0; y < BOARD_COL; y++) {
+	// 		if (myBoard[x][y] != EMPTY)
+	// 			continue;
+	// 		double tmpScore = Get_ScoreOfSingleMove(myBoard, { x, y }, player);
+	// 		if (tmpScore >= maxscore && abs(BOARD_ROW / 2 - x) + abs(BOARD_COL / 2 - y) < abs(BOARD_ROW / 2 - bestmove.X) + abs(BOARD_COL / 2 - bestmove.Y)) {
+	// 			bestmove = { x, y };
+	// 			maxscore = tmpScore;
+	// 		}
+	// 	}
+	// }
+	POSITION bestmove = {9, 9};
 	return bestmove;
 }
 
@@ -531,8 +532,6 @@ int myturn(int cnt) {
 
 	int x[2], y[2];
 
-	// 이 부분에서 알고리즘 프로그램(AI)을 작성하십시오. 기본 제공된 코드를 수정 또는 삭제하고 본인이 코드를 사용하시면 됩니다.
-	// 현재 Sample code의 AI는 Random으로 돌을 놓는 Algorithm이 작성되어 있습니다.
 	if (cnt == 1) {
 		POSITION myMove = Find_BestSingleMove(myBoard, 1);
 		x[0] = myMove.X;
@@ -583,9 +582,6 @@ int myturn(int cnt) {
 	// 필수 함수 : domymove(x배열,y배열,배열크기)
 	// 여기서 배열크기(cnt)는 myturn()의 파라미터 cnt를 그대로 넣어야합니다.
 	domymove(x, y, cnt);
-	if(Is_Conn6(myBoard, {{x[0], y[0]}, {x[1], y[1]}}, 1) == true){
-		printf("HA HA HA\n");
-		return 1;
-	}
+	
 	return 0;
 }

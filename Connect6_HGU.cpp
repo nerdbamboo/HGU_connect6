@@ -52,7 +52,7 @@ int main() {
     //init();
 
 	nlohmann::json input, moveX, moveY;
-    cin >> input >> moveX >> moveY;
+    cin >> input >> moveX >> moveY >> cnt;
 
 	//int prev[BOARD_SIZE][BOARD_SIZE];
 	int x[2], y[2];
@@ -74,8 +74,9 @@ int main() {
 		x[i] = moveX[i];
 		y[i] = moveY[i];
 	}
+	//cout <<"x:" << x[0] << " " << x[1] << "\ny:" << y[0] << " " << y[1] << endl; 
  	opmove(x, y, 2);
-	int gameEnd = myturn(2);
+	int gameEnd = myturn(cnt);
 
 	return 0;
 }

@@ -1,1 +1,2 @@
-print(output)
+moveX.clear()
+                            moveY.clear()

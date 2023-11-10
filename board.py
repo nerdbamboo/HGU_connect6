@@ -115,13 +115,14 @@ def main():
                         if is_black_turn:
                             input_data = json.dumps(board) # 배열을 JSON 문자열로 변환
                             input_data += f'\n{moveX}\n{moveY}\n'
+                            input_data += f'{cnt}\n'
                             #print(input_data)
                             moveX.clear()
                             moveY.clear()
 
                             result = subprocess.run(['./play'], input=input_data.encode(), stdout=subprocess.PIPE)
-                            #output = result.stdout.decode()
-                            #print("C++ 프로그램의 출력 결과:", output)
+                            output = result.stdout.decode()
+                            print("C++ 프로그램의 출력 결과:\n", output)
 
                             output = result.stdout.decode().strip().split()
                             
