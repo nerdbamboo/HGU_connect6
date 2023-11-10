@@ -51,11 +51,11 @@ void printBoard(){ // 바둑판 출력
 int main() {
     //init();
 
-	nlohmann::json input, moveX, moveY;
-    cin >> input >> moveX >> moveY >> cnt;
+	nlohmann::json input, moveX, moveY, selfMoveX, selfMoveY;
+    cin >> input >> moveX >> moveY >> selfMoveX >> selfMoveY;
 
 	//int prev[BOARD_SIZE][BOARD_SIZE];
-	int x[2], y[2];
+	int x[2], y[2], mx[2], my[2];
 	//int cmp = 0;
 	for(int i = 0; i < 19; i++) {
 		for(int j = 0; j < 19; j++) {
@@ -73,9 +73,12 @@ int main() {
 	for(int i = 0; i < 2; i++){
 		x[i] = moveX[i];
 		y[i] = moveY[i];
+		mx[i] = selfMoveX[i];
+		my[i] = selfMoveY[i];
 	}
 	//cout <<"x:" << x[0] << " " << x[1] << "\ny:" << y[0] << " " << y[1] << endl; 
  	opmove(x, y, 2);
+	RenewalMytMoves(mx[0], mx[1], my[0], my[1]);
 	int gameEnd = myturn(cnt);
 
 	return 0;
@@ -104,8 +107,6 @@ void mymove(int x[], int y[], int cnt) {
             printf("ERROR 이미 돌이 있는 위치입니다. MY[%d, %d]", x[i], y[i]);
 		}
 	}
-	if(cnt == 2)
-		RenewalMytMoves(x[0], x[1], y[0], y[1]);
 }
 
 void opmove(int x[], int y[], int cnt) {
