@@ -71,7 +71,7 @@ def main():
     is_black_turn = False
     running = True
     draw_board(screen)
-    cnt = 1
+    cnt = 0
     
     # Setting blokcing location
     red_cnt = 0
@@ -114,69 +114,47 @@ def main():
                     row = round(x / GRID_SIZE)
                     col = round(y / GRID_SIZE)
                     if board[col-1][row-1] == 0:
-                        # 돌 놓기 (검은 돌과 흰 돌 번갈아가며 놓기)
-                        if is_black_turn:
-                            print(selfMoveX)
-                            print(selfMoveY)
-                            input_data = json.dumps(board) # 배열을 JSON 문자열로 변환
-                            input_data += f'\n{moveX}\n{moveY}\n{selfMoveX}\n{selfMoveY}'
-
-                            print(input_data)
-                            moveX.clear()
-                            moveY.clear()
-                            selfMoveX.clear()
-                            selfMoveY.clear()
-
-                            result = subprocess.run(['./play'], input=input_data.encode(), stdout=subprocess.PIPE)
-                            output = result.stdout.decode()
-                            print("C++ 프로그램의 출력 결과:\n", output)
-
-                            output = result.stdout.decode().strip().split()
-                            row = float(output[0])
-                            col = float(output[1])
-                            selfMoveX.append(int(row)-1)
-                            selfMoveY.append(int(col)-1)
-                            
-                            # print(int(row))
-                            # print(int(col))
-                            screen.blit(black_stone, (col * GRID_SIZE - (size/2), row * GRID_SIZE - (size/2)))
-                            board[int(row)-1][int(col)-1] = 1
-                            
-                            row = float(output[2])
-                            col = float(output[3])
-                            selfMoveX.append(int(row)-1)
-                            selfMoveY.append(int(col)-1)
-                            # print(int(row))
-                            # print(int(col))
-                            screen.blit(black_stone, (col * GRID_SIZE - (size/2), row * GRID_SIZE - (size/2)))
-                            board[int(row)-1][int(col)-1] = 1
-                            
-                            # check debugging
-                            # for i in range(19):
-                            #     for j in range(19):
-                            #         print(board[i][j], end = " ")
-                            #     print()
-                        else:
-                            print(f"클릭한 위치: Row {col}, Col {row}")
+                        # Turn for human
+                        if not is_black_turn:
+                            # print(f"클릭한 위치: Row {col}, Col {row}")
                             screen.blit(white_stone, (row * GRID_SIZE - (size/2), col * GRID_SIZE - (size/2)))
                             board[col-1][row-1] = 2
                             moveX.append(col-1)
                             moveY.append(row-1)
                             
-                            # check debugging
-                    for i in range(19):
-                        for j in range(19):
-                            print(board[i][j], end = " ")
-                        print()       
-                        
-                        if cnt == 2:
-                            is_black_turn = not is_black_turn
-                            cnt = 0
-                        if is_black_turn:
-                            cnt += 2
-                        else:
-                            cnt += 1
-                
+                            cnt += 1   
+                         
+        # Turn for AI    
+        if is_black_turn:
+            input_data = json.dumps(board) # 배열을 JSON 문자열로 변환
+            input_data += f'\n{moveX}\n{moveY}\n{selfMoveX}\n{selfMoveY}'
+            moveX.clear()
+            moveY.clear()
+            selfMoveX.clear()
+            selfMoveY.clear()
+
+            result = subprocess.run(['./play'], input=input_data.encode(), stdout=subprocess.PIPE)
+            output = result.stdout.decode().strip().split()
+            
+            row = float(output[0])
+            col = float(output[1])
+            selfMoveX.append(int(row)-1)
+            selfMoveY.append(int(col)-1)
+            screen.blit(black_stone, (col * GRID_SIZE - (size/2), row * GRID_SIZE - (size/2)))
+            board[int(row)-1][int(col)-1] = 1
+            
+            row = float(output[2])
+            col = float(output[3])
+            selfMoveX.append(int(row)-1)
+            selfMoveY.append(int(col)-1)
+            screen.blit(black_stone, (col * GRID_SIZE - (size/2), row * GRID_SIZE - (size/2)))
+            board[int(row)-1][int(col)-1] = 1
+            
+            cnt += 2
+        
+        if cnt == 2:
+            is_black_turn = not is_black_turn
+            cnt = 0
         
         running = check_connect6(board)
         pygame.display.flip()
