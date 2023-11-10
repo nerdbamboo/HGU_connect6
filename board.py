@@ -116,10 +116,12 @@ def main():
                     if board[col-1][row-1] == 0:
                         # 돌 놓기 (검은 돌과 흰 돌 번갈아가며 놓기)
                         if is_black_turn:
+                            print(selfMoveX)
+                            print(selfMoveY)
                             input_data = json.dumps(board) # 배열을 JSON 문자열로 변환
-                            input_data += f'\n{moveX}\n{moveY}\n'
-                            input_data += f'\n{selfMoveX}\n{selfMoveY}\n'
-                            #print(input_data)
+                            input_data += f'\n{moveX}\n{moveY}\n{selfMoveX}\n{selfMoveY}'
+
+                            print(input_data)
                             moveX.clear()
                             moveY.clear()
                             selfMoveX.clear()
@@ -130,12 +132,10 @@ def main():
                             print("C++ 프로그램의 출력 결과:\n", output)
 
                             output = result.stdout.decode().strip().split()
-                            selfMoveX.append(output[0])
-                            selfMoveY.append(output[1])
-                            selfMoveX.append(output[2])
-                            selfMoveY.append(output[3])
                             row = float(output[0])
                             col = float(output[1])
+                            selfMoveX.append(int(row)-1)
+                            selfMoveY.append(int(col)-1)
                             
                             # print(int(row))
                             # print(int(col))
@@ -144,6 +144,8 @@ def main():
                             
                             row = float(output[2])
                             col = float(output[3])
+                            selfMoveX.append(int(row)-1)
+                            selfMoveY.append(int(col)-1)
                             # print(int(row))
                             # print(int(col))
                             screen.blit(black_stone, (col * GRID_SIZE - (size/2), row * GRID_SIZE - (size/2)))
