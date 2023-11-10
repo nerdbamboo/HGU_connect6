@@ -94,11 +94,15 @@ int main() {
 	nlohmann::json input;
     cin >> input;
 
-	for(int i=0; i<BOARD_SIZE; i++) 
-		for(int j=0; j<BOARD_SIZE; j++)
+	for(int i=0; i<BOARD_SIZE; i++) {
+		for(int j=0; j<BOARD_SIZE; j++) {
 			board[i][j] = input[i][j].get<int>();
+			// cout << board[i][j] << " ";
+		}
+		// cout << "\n";
+	}
 
-	int gameEnd = myturn(1);
+	int gameEnd = myturn(2);
 
 	return 0;
 }
