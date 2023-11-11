@@ -50,7 +50,7 @@ typedef pair<MOVES, double> MOVES_SCORE;
 //char info[] = { "TeamName:자본주의가낳은AI,Department:고려대학교" };
 
 MOVES CurrentOpponentMoves = { {-1, -1}, {-1, -1} }; // opmove가 실행된 후 상대방의 착수를 저장하는 변수
-MOVES CurrentMyMoves = { { 9, 9 },{ -1, -1 } }; // opmove가 실행된 후 상대방의 착수를 저장하는 변수
+MOVES CurrentMyMoves = { { -1, -1 },{ -1, -1 } }; // opmove가 실행된 후 상대방의 착수를 저장하는 변수
 
 void RenewalOpponentMoves(int x0, int x1, int y0, int y1) {
 	CurrentOpponentMoves = { {x0, y0}, {x1, y1} };
