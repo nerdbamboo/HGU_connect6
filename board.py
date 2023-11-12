@@ -30,6 +30,8 @@ black_stone = pygame.transform.scale(black_stone, (size, size))
 white_stone = pygame.transform.scale(white_stone, (size, size))
 red_stone = pygame.transform.scale(red_stone, (size, size))
 
+
+
 stone_list = []
 stone_list.append(red_stone)
 stone_list.append(black_stone)
@@ -85,7 +87,7 @@ def get_block_num():
     label.pack(padx=30, pady=20)
 
     # 1에서 4까지의 버튼 추가
-    for block_num in range(1, 5):
+    for block_num in range(0, 5):
         button = tk.Button(custom_box, text=str(block_num), command=lambda b=block_num: on_button_click(b))
         button.pack(side="left", padx=10)
 
@@ -112,6 +114,7 @@ def check_connect6(board):
 
     for x in range(width):
         for y in range(height):
+
             if board[x][y] == 1 or board[x][y] == 2:
                 for dx, dy in directions:
                     count = 0
@@ -136,7 +139,6 @@ def main():
 
     MY_AI = me
     OP_AI = 3 - me
-
 
     opMoveX = []
     opMoveY = []
@@ -188,6 +190,7 @@ def main():
     
 
     while running:
+        
         # Turn for AI    
         if is_my_ai_turn:
             
@@ -239,8 +242,10 @@ def main():
                             opMoveX.append(col-1)
                             opMoveY.append(row-1)
                             cnt += 1
-                         
-        
+
+
+
+
         if cnt == 2:
             is_my_ai_turn = not is_my_ai_turn
             cnt = 0
