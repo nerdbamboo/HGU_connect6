@@ -576,9 +576,9 @@ void print_board(int myBoard[][BOARD_COL]) {
     }
     printf("\n");
 }
-int competitive(int breadth, int depth, int N) { // f1과 f2이 흑을 잡고 N번 경기했을 때 이긴 횟수
+vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 흑을 잡고 N번 경기했을 때 이긴 횟수
     //00010203040506070809101112131415161718
-    int winpt = 0; // 이기면 2, 비기면 1, 지면 0점을 더한 후 2로 나눌 계획
+    vector<int> winpt; // 이기면 2, 비기면 1, 지면 0점을 더한 후 2로 나눌 계획
     for (int comp = 0; comp < N; comp++) {
         int myBoard[BOARD_ROW][BOARD_COL] = {
             { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 0
@@ -601,28 +601,19 @@ int competitive(int breadth, int depth, int N) { // f1과 f2이 흑을 잡고 N�
             { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 17
             { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }  // ROW 18
         };
-        random_device rd;  //Will be used to obtain a seed for the random number engine
-        mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-        uniform_int_distribution<> dis(0, 18);
-        int stuckNum = 6; // 장애물은 6개
-        while (stuckNum) {
-            int stuck_x = dis(gen);
-            int stuck_y = dis(gen);
-            if (myBoard[stuck_x][stuck_y] == EMPTY) {
-                myBoard[stuck_x][stuck_y] = BLOCK;
-                stuckNum--;
-            }
-        }  // 장애물 설치 완료
-        POSITION myMove = Find_BestSingleMove(myBoard, f1, BLACK); // 흑이 먼저 착수
+
+        POSITION myMove = Find_BestSingleMove(myBoard, BLACK); // 흑이 먼저 착수
         myBoard[myMove.X][myMove.Y] = BLACK;
         int CurrentPlayer = WHITE;
         int winner = 0;
+
         MOVES CurrentWhiteMoves = { {-1, -1}, {-1, -1} };
         MOVES CurrentBlackMoves = { { -1, -1 },{ -1, -1 } };
+
         for (int tmp_cnt = 0; tmp_cnt < 170; tmp_cnt++) { // 170수를 둘 때 까지만 진행. 더 넘어가면 그냥 무승부라고 볼 것임
             if (CurrentPlayer == WHITE) { // 백의 차례이면
                 int st_time = clock();
-                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentWhiteMoves, CurrentBlackMoves, f2, WHITE, 2, 0, 2, st_time);
+                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentWhiteMoves, CurrentBlackMoves, WHITE, b1, 0, d1, st_time);
                 myBoard[t.first.first.X][t.first.first.Y] = WHITE;
                 myBoard[t.first.second.X][t.first.second.Y] = WHITE;
                 CurrentWhiteMoves = t.first;
@@ -634,7 +625,7 @@ int competitive(int breadth, int depth, int N) { // f1과 f2이 흑을 잡고 N�
             }
             else { // 흑의 차례이면
                 int st_time = clock();
-                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentBlackMoves, CurrentWhiteMoves, f1, BLACK, 2, 0, 2, st_time);
+                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentBlackMoves, CurrentWhiteMoves, BLACK, b2 , 0, d2, st_time);
                 myBoard[t.first.first.X][t.first.first.Y] = BLACK;
                 myBoard[t.first.second.X][t.first.second.Y] = BLACK;
                 CurrentBlackMoves = t.first;
@@ -645,10 +636,19 @@ int competitive(int breadth, int depth, int N) { // f1과 f2이 흑을 잡고 N�
                 CurrentPlayer = WHITE;
             }
         }
-        if (winner == BLACK) // f1이 이겼으면
-            winpt += 2;
+        
+        if (winner == BLACK) {
+            winpt.push_back(BLACK);
+            winpt.push_back(d2);
+            winpt.push_back(b2);
+        }
+        else if(winner == WHITE){
+            winpt.push_back(WHITE);
+            winpt.push_back(d1);
+            winpt.push_back(b1);
+        }
         if (winner == 0) // 무승부이면
-            winpt += 1;
+            winpt.push_back(0);
     }
  
     
@@ -663,13 +663,18 @@ void GeneticAlgorithm(void) {
         FILE* fp = fopen("-", "a");
         fprintf(fp, "============= Round #%d ===========\n", Round);
         printf("============= Round #%d ===========\n", Round);
- 
-        for (int i = 0; i < FACTOR_NUM; i++) {
-            for (int j = i + 1; j < FACTOR_NUM; j++) {
-                int N = 5; // 흑으로 5판, 백으로 5판
-                int winpt = competitive(3, 7, N) + (2 * N - competitive(4, 8, N));
-            }
+        int N = 5; // 흑으로 5판, 백으로 5판
+        vector<int> winpt = competitive(3, 7, 3, 8, N);
+        if(winpt[0] == 1){
+            printf("BLACK ");
         }
+        else if(winpt[0] == 2){
+            printf("WHITE ");
+        }
+        else {
+            printf("DUCE ");
+        }
+
     }
 }
 

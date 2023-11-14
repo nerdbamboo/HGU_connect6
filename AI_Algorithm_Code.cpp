@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <tuple>
 #include <time.h>
-#include "Connect6Algo.h"
 using namespace std;
 typedef pair<int, int> POSITION;
 typedef pair<POSITION, POSITION> MOVES;
