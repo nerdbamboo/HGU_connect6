@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <tuple>
 #include <time.h>
+#include <iostream>
+#include <random>
 
 using namespace std;
 typedef pair<int, int> POSITION;
@@ -464,7 +466,7 @@ vector<MOVES_SCORE> Find_CandidateOfBestDoubleMoves(int myBoard[][BOARD_COL], MO
 MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES myMoves, MOVES OpMoves, int player, int Breadth, int currentDepth, int maxDepth, long st_time) {
 	double time_limit = 7;
 	MOVES_SCORE tmpMax = { { { -1,-1 },{ -1,-1 } }, -100000000.0 };
-	vector<MOVES_SCORE> candidate = Find_CandidateOfBestDoubleMoves(myboard, myMoves, OpMoves, player, Breadth);
+	vector<MOVES_SCORE> candidate = Find_CandidateOfBestDoubleMoves(myboard, myMoves, OpMoves, player, Breadth + 25);
     //printf("%d, %lf, %lf\n", player, candidate[0].second, candidate[1].second);
 
 	if (candidate[0].second < -3000000.0) // 가장 최선인 수 조차 필패일 경우
@@ -486,7 +488,7 @@ MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES my
 		myboard[tmp.second.X][tmp.second.Y] = player;
 		MOVES_SCORE currentBest;
 		if(currentDepth == 0)
-			currentBest = Find_BestDoubleMovesByDepthSearch(myboard, OpMoves, tmp,  3 - player, Breadth, currentDepth + 1, maxDepth, st_time);
+			currentBest = Find_BestDoubleMovesByDepthSearch(myboard, OpMoves, tmp,  3 - player, Breadth+5, currentDepth + 1, maxDepth, st_time);
 		else
 			currentBest = Find_BestDoubleMovesByDepthSearch(myboard, OpMoves, tmp, 3 - player, Breadth, currentDepth + 1, maxDepth, st_time);
 		if ((1.0 * (clock() - st_time) / (CLOCKS_PER_SEC) > time_limit) && (tmpMax.first.first.X != -1)) { // 들어갔다 나왔더니 시간을 넘겼으면(그리고 tmpMax에는 후보가 들어가있다면)
@@ -587,10 +589,25 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
             { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }  // ROW 18
         };
 
+
         POSITION myMove = Find_BestSingleMove(myBoard, BLACK); // 흑이 먼저 착수
         myBoard[myMove.X][myMove.Y] = BLACK;
         int CurrentPlayer = WHITE;
         int winner = 0;
+
+		random_device rd;  //Will be used to obtain a seed for the random number engine
+        mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+        uniform_int_distribution<> dis(0, 18);
+        int stuckNum = 2; // 장애물은 6개
+        while (stuckNum) {
+            int stuck_x = dis(gen);
+            int stuck_y = dis(gen);
+            if (myBoard[stuck_x][stuck_y] == EMPTY && stuck_x != 9 && stuck_y != 9) {
+                myBoard[stuck_x][stuck_y] = BLOCK;
+                stuckNum--;
+            }
+        }  // 장애물 설치 완료
+
 
         MOVES CurrentWhiteMoves = { {-1, -1}, {-1, -1} };
         MOVES CurrentBlackMoves = { { 9, 9 },{ -1, -1 } };
@@ -653,43 +670,69 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
 }
  
 
-void GeneticAlgorithm(void) {
-    const int FACTOR_NUM = 16;
-
-    for (int Round = 1; Round < 2 ; Round++) {
-        FILE* fp = fopen("-", "a");
-        fprintf(fp, "============= Round #%d ===========\n", Round);
+void Algorithm(void) {
+    vector<pair<pair<int, int>, pair<int, int>>> matchups = {
+            {{4, 7}, {3, 8}},
+            {{5, 6}, {4, 7}},
+            {{5, 6}, {3, 8}},
+            {{6, 6}, {4, 7}},
+            {{5, 7}, {3, 8}},
+            {{4, 8}, {3, 9}},
+            {{5, 7}, {3, 9}},
+            {{5, 7}, {4, 8}},
+            {{7, 7}, {6, 9}},
+            {{6, 8}, {6, 9}},
+    };
+    for (int Round = 1; Round < 11; Round++) {
+        FILE* fp = fopen("output.txt", "a+"); // 파일에 출력
+        fprintf(fp, "============= Round #%d ===========\n%d %d vs %d %d\n", Round, matchups[Round - 1].first.first, matchups[Round - 1].first.second, matchups[Round - 1].second.first, matchups[Round - 1].second.second);
         printf("============= Round #%d ===========\n", Round);
-        int N = 2; // 흑으로 5판, 백으로 5판
-        vector<int> winpt = competitive(5, 5, 3, 7, N);
-        vector<int> winpt2 = competitive(3, 7, 5, 5, N);
+
+            int N = 5; // 흑으로 5판, 백으로 5판
+
+            vector<int> winpt = competitive(matchups[Round - 1].first.first, matchups[Round - 1].first.second, matchups[Round - 1].second.first, matchups[Round - 1].second.second, N);
+            vector<int> winpt2 = competitive(matchups[Round - 1].second.first, matchups[Round - 1].second.second, matchups[Round - 1].first.first, matchups[Round - 1].first.second, N);
+
+            	int cnt_b = 0;
+		int cnt_w = 0;
         for(auto i : winpt){
             if(i == 1){
-                printf("BLACK ");
+                cnt_b++;
             }
             else if(i == 2){
-                printf("WHITE ");
-            }
-            else {
-                printf("TIE ");
+                cnt_w++;
             }
         }
+        fprintf(fp, "BLACK : Breadth(%d), Depth(%d) : %d games win\n", matchups[Round - 1].second.first, matchups[Round - 1].second.second, cnt_b);
+        fprintf(fp, "WHITE : Breadth(%d), Depth(%d) : %d games win\n", matchups[Round - 1].first.first, matchups[Round - 1].first.second, cnt_w);
+        fprintf(fp, "TIE : %d\n", N - cnt_b - cnt_w);
+		cout << "BLACK : Breadth(" << matchups[Round - 1].second.first << "), Depth(" << matchups[Round - 1].second.second << ") : " << cnt_b << "games win\n";
+		cout << "WHITE : Breadth(" << matchups[Round - 1].first.first << "), Depth(" << matchups[Round - 1].first.second << ") : " << cnt_w << "games win\n";
+		cout << "TIE : " << N - cnt_b - cnt_w << "\n";
 
+		cnt_b = 0;
+		cnt_w = 0;
         for(auto i : winpt2){
             if(i == 1){
-                printf("BLACK ");
+                cnt_b++;
             }
             else if(i == 2){
-                printf("WHITE ");
+                cnt_w++;
             }
-            else {
-                printf("TIE ");
-            }
-        }
+		}
+        fprintf(fp, "BLACK : Breadth(%d), Depth(%d) : %d games win\n", matchups[Round - 1].first.first, matchups[Round - 1].first.second, cnt_b);
+        fprintf(fp, "WHITE : Breadth(%d), Depth(%d) : %d games win\n", matchups[Round - 1].second.first, matchups[Round - 1].second.second, cnt_w);
+        fprintf(fp, "TIE : %d\n", N - cnt_b - cnt_w);
 
+		cout << "BLACK : Breadth(" << matchups[Round - 1].first.first << "), Depth(" << matchups[Round - 1].first.second << ") : " << cnt_b << " games win\n";
+		cout << "WHITE : Breadth(" << matchups[Round - 1].second.first << "), Depth(" << matchups[Round - 1].second.second << ") : " << cnt_w << " games win\n";
+		cout << "TIE : " << N - cnt_b - cnt_w << "\n";
+
+
+        fclose(fp);
     }
 }
 
 int main(void) {    
-    GeneticAlgorithm();    
+    Algorithm();    
 }
