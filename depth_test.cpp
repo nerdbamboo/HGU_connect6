@@ -462,7 +462,7 @@ vector<MOVES_SCORE> Find_CandidateOfBestDoubleMoves(int myBoard[][BOARD_COL], MO
 }
 
 MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES myMoves, MOVES OpMoves, int player, int Breadth, int currentDepth, int maxDepth, long st_time) {
-	double time_limit = 28;
+	double time_limit = 7;
 	MOVES_SCORE tmpMax = { { { -1,-1 },{ -1,-1 } }, -100000000.0 };
 	vector<MOVES_SCORE> candidate = Find_CandidateOfBestDoubleMoves(myboard, myMoves, OpMoves, player, Breadth);
 	if (candidate[0].second < -3000000.0) // 가장 최선인 수 조차 필패일 경우
@@ -605,24 +605,27 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
         for (int tmp_cnt = 0; tmp_cnt < 170; tmp_cnt++) { // 170수를 둘 때 까지만 진행. 더 넘어가면 그냥 무승부라고 볼 것임
             if (CurrentPlayer == WHITE) { // 백의 차례이면
                 int st_time = clock();
-                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentWhiteMoves, CurrentBlackMoves, WHITE, b1, 0, d1, st_time);
+                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentWhiteMoves, CurrentBlackMoves, WHITE, 30, 0, d1, st_time);
                 myBoard[t.first.first.X][t.first.first.Y] = WHITE;
                 myBoard[t.first.second.X][t.first.second.Y] = WHITE;
                 CurrentWhiteMoves = t.first;
                 if (t.second >= 50000) {
                     winner = WHITE;
+                    print_board(myBoard);
                     break;
                 }
                 CurrentPlayer = BLACK;
             }
             else { // 흑의 차례이면
                 int st_time = clock();
-                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentBlackMoves, CurrentWhiteMoves, BLACK, b2 , 0, d2, st_time);
+                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentBlackMoves, CurrentWhiteMoves, BLACK, 30 , 0, d2, st_time);
                 myBoard[t.first.first.X][t.first.first.Y] = BLACK;
                 myBoard[t.first.second.X][t.first.second.Y] = BLACK;
                 CurrentBlackMoves = t.first;
+                printf("[%d, %d], [%d, %d], [%lf]\n", t.first.first.X, t.first.first.Y, t.first.second.X, t.first.second.Y, t.second);
                 if (t.second >= 50000) {
                     winner = BLACK;
+                    print_board(myBoard);
                     break;
                 }
                 CurrentPlayer = WHITE;
@@ -653,15 +656,17 @@ void GeneticAlgorithm(void) {
         fprintf(fp, "============= Round #%d ===========\n", Round);
         printf("============= Round #%d ===========\n", Round);
         int N = 5; // 흑으로 5판, 백으로 5판
-        vector<int> winpt = competitive(3, 7, 3, 8, N);
-        if(winpt[0] == 1){
-            printf("BLACK ");
-        }
-        else if(winpt[0] == 2){
-            printf("WHITE ");
-        }
-        else {
-            printf("DUCE ");
+        vector<int> winpt = competitive(3, 7, 3, 5, N);
+        for(auto i : winpt){
+            if(winpt[i] == 1){
+                printf("BLACK ");
+            }
+            else if(winpt[i] == 2){
+                printf("WHITE ");
+            }
+            else {
+                printf("DUCE ");
+            }
         }
 
     }
