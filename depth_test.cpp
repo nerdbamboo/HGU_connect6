@@ -486,9 +486,9 @@ MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES my
 		myboard[tmp.second.X][tmp.second.Y] = player;
 		MOVES_SCORE currentBest;
 		if(currentDepth == 0)
-			currentBest = Find_BestDoubleMovesByDepthSearch(myboard, OpMoves, tmp,  3 - player, 4, currentDepth + 1, maxDepth, st_time);
+			currentBest = Find_BestDoubleMovesByDepthSearch(myboard, OpMoves, tmp,  3 - player, Breadth, currentDepth + 1, maxDepth, st_time);
 		else
-			currentBest = Find_BestDoubleMovesByDepthSearch(myboard, OpMoves, tmp, 3 - player, 3, currentDepth + 1, maxDepth, st_time);
+			currentBest = Find_BestDoubleMovesByDepthSearch(myboard, OpMoves, tmp, 3 - player, Breadth, currentDepth + 1, maxDepth, st_time);
 		if ((1.0 * (clock() - st_time) / (CLOCKS_PER_SEC) > time_limit) && (tmpMax.first.first.X != -1)) { // 들어갔다 나왔더니 시간을 넘겼으면(그리고 tmpMax에는 후보가 들어가있다면)
 			myboard[tmp.first.X][tmp.first.Y] = EMPTY;
 			myboard[tmp.second.X][tmp.second.Y] = EMPTY;
@@ -503,62 +503,6 @@ MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES my
 	return tmpMax;
 }
 
-int myturn(int cnt) {
-	long st_time = clock();
-	int myBoard[BOARD_ROW][BOARD_COL];
-
-	int x[2], y[2];
-
-	if (cnt == 1) {
-		POSITION myMove = Find_BestSingleMove(myBoard, 1);
-		x[0] = myMove.X;
-		x[1] = -1;
-		y[0] = myMove.Y;
-		y[1] = -1;
-	}
-	else {
-		MOVES_SCORE myMove = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentMyMoves, CurrentOpponentMoves, 1, 30, 0, 7, st_time);
-		x[0] = myMove.first.first.X;
-		x[1] = myMove.first.second.X;
-		y[0] = myMove.first.first.Y;
-		y[1] = myMove.first.second.Y; 
-        
-        // 만약 myMove에 불가능한 쌍이 들어왔다면
-		if (IsOutOfBounds(x[0], y[0]) || myBoard[x[0]][y[0]] != EMPTY) {
-			bool isFindDone = false;
-			for (int i = 0; i < BOARD_ROW; i++) {
-				for (int j = 0; j < BOARD_COL; j++) {
-					if (myBoard[i][j] == EMPTY && (i != x[1] || j != y[1])) {
-						x[0] = i;
-						y[0] = j;
-						isFindDone = true;
-						break;
-					}
-				}
-				if (isFindDone)
-					break;
-			}
-		}
-		if (IsOutOfBounds(x[1], y[1]) || myBoard[x[1]][y[1]] != EMPTY) {
-			bool isFindDone = false;
-			for (int i = 0; i < BOARD_ROW; i++) {
-				for (int j = 0; j < BOARD_COL; j++) {
-					if (myBoard[i][j] == EMPTY && (i != x[0] || j != y[0])) {
-						x[1] = i;
-						y[1] = j;
-						isFindDone = true;
-						break;
-					}
-				}
-				if (isFindDone)
-					break;
-			}
-		}
-		CurrentMyMoves = { {x[0], y[0]}, {x[1], y[1]} };
-	}
-	
-	return 0;
-}
 
 int check_connect6(int board[][19]) {
     // 바둑판의 크기
@@ -654,7 +598,7 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
         for (int tmp_cnt = 0; tmp_cnt < 170; tmp_cnt++) { // 170수를 둘 때 까지만 진행. 더 넘어가면 그냥 무승부라고 볼 것임
             if (CurrentPlayer == WHITE) { // 백의 차례이면
                 int st_time = clock();
-                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentWhiteMoves, CurrentBlackMoves, WHITE, 30, 0, d1, st_time);
+                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentWhiteMoves, CurrentBlackMoves, WHITE, b1, 0, d1, st_time);
                 myBoard[t.first.first.X][t.first.first.Y] = WHITE;
                 myBoard[t.first.second.X][t.first.second.Y] = WHITE;
                 CurrentWhiteMoves = t.first;
@@ -668,7 +612,7 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
             }
             else { // 흑의 차례이면
                 int st_time = clock();
-                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentBlackMoves, CurrentWhiteMoves, BLACK, 30 , 0, d2, st_time);
+                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentBlackMoves, CurrentWhiteMoves, BLACK, b2, 0, d2, st_time);
                 myBoard[t.first.first.X][t.first.first.Y] = BLACK;
                 myBoard[t.first.second.X][t.first.second.Y] = BLACK;
                 CurrentBlackMoves = t.first;
@@ -716,17 +660,30 @@ void GeneticAlgorithm(void) {
         FILE* fp = fopen("-", "a");
         fprintf(fp, "============= Round #%d ===========\n", Round);
         printf("============= Round #%d ===========\n", Round);
-        int N = 5; // 흑으로 5판, 백으로 5판
-        vector<int> winpt = competitive(3, 7, 3, 7, N);
+        int N = 2; // 흑으로 5판, 백으로 5판
+        vector<int> winpt = competitive(5, 5, 3, 7, N);
+        vector<int> winpt2 = competitive(3, 7, 5, 5, N);
         for(auto i : winpt){
-            if(winpt[i] == 1){
+            if(i == 1){
                 printf("BLACK ");
             }
-            else if(winpt[i] == 2){
+            else if(i == 2){
                 printf("WHITE ");
             }
             else {
-                printf("DUCE ");
+                printf("TIE ");
+            }
+        }
+
+        for(auto i : winpt2){
+            if(i == 1){
+                printf("BLACK ");
+            }
+            else if(i == 2){
+                printf("WHITE ");
+            }
+            else {
+                printf("TIE ");
             }
         }
 
