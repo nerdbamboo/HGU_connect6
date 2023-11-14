@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 
+
 using namespace std;
 typedef pair<int, int> POSITION;
 typedef pair<POSITION, POSITION> MOVES;
@@ -505,7 +506,6 @@ MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES my
 	return tmpMax;
 }
 
-
 int check_connect6(int board[][19]) {
     // 바둑판의 크기
     int width = 19;
@@ -552,8 +552,6 @@ int check_connect6(int board[][19]) {
     return 0;
 }
 
-
- 
 void print_board(int myBoard[][BOARD_COL]) {
     for (int x = 0; x < BOARD_ROW; x++) {
         for (int y = 0; y < BOARD_COL; y++) {
@@ -563,8 +561,8 @@ void print_board(int myBoard[][BOARD_COL]) {
     }
     printf("\n");
 }
+
 vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 흑을 잡고 N번 경기했을 때 이긴 횟수
-    //00010203040506070809101112131415161718
     vector<int> winpt; // 이기면 2, 비기면 1, 지면 0점을 더한 후 2로 나눌 계획
     for (int comp = 0; comp < N; comp++) {
         int myBoard[BOARD_ROW][BOARD_COL] = {
@@ -588,7 +586,7 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
             { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 17
             { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }  // ROW 18
         };
-
+	
 
         POSITION myMove = Find_BestSingleMove(myBoard, BLACK); // 흑이 먼저 착수
         myBoard[myMove.X][myMove.Y] = BLACK;
@@ -619,7 +617,7 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
                 myBoard[t.first.first.X][t.first.first.Y] = WHITE;
                 myBoard[t.first.second.X][t.first.second.Y] = WHITE;
                 CurrentWhiteMoves = t.first;
-                printf("W: [%d, %d], [%d, %d], [%lf]\n", t.first.first.X, t.first.first.Y, t.first.second.X, t.first.second.Y, t.second);
+                // printf("W: [%d, %d], [%d, %d], [%lf]\n", t.first.first.X, t.first.first.Y, t.first.second.X, t.first.second.Y, t.second);
                 // if (t.second >= 500000) {
                 //     winner = WHITE;
                 //     print_board(myBoard);
@@ -633,7 +631,7 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
                 myBoard[t.first.first.X][t.first.first.Y] = BLACK;
                 myBoard[t.first.second.X][t.first.second.Y] = BLACK;
                 CurrentBlackMoves = t.first;
-                printf("B: [%d, %d], [%d, %d], [%lf]\n", t.first.first.X, t.first.first.Y, t.first.second.X, t.first.second.Y, t.second);
+                // printf("B: [%d, %d], [%d, %d], [%lf]\n", t.first.first.X, t.first.first.Y, t.first.second.X, t.first.second.Y, t.second);
                 // if (t.second >= 500000) {
                 //     winner = BLACK;
                 //     print_board(myBoard);
@@ -644,12 +642,12 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
             int check = check_connect6(myBoard);
             if(check == 2){
                 winner = WHITE;
-                print_board(myBoard);
+                // print_board(myBoard);
                 break;
             }
             else if(check == 1){
                 winner = BLACK;
-                print_board(myBoard);
+                // print_board(myBoard);
                 break;
             }
         }
@@ -688,12 +686,12 @@ void Algorithm(void) {
         fprintf(fp, "============= Round #%d ===========\n%d %d vs %d %d\n", Round, matchups[Round - 1].first.first, matchups[Round - 1].first.second, matchups[Round - 1].second.first, matchups[Round - 1].second.second);
         printf("============= Round #%d ===========\n", Round);
 
-            int N = 5; // 흑으로 5판, 백으로 5판
+        int N = 5; // 흑으로 5판, 백으로 5판
 
-            vector<int> winpt = competitive(matchups[Round - 1].first.first, matchups[Round - 1].first.second, matchups[Round - 1].second.first, matchups[Round - 1].second.second, N);
-            vector<int> winpt2 = competitive(matchups[Round - 1].second.first, matchups[Round - 1].second.second, matchups[Round - 1].first.first, matchups[Round - 1].first.second, N);
+        vector<int> winpt = competitive(matchups[Round - 1].first.first, matchups[Round - 1].first.second, matchups[Round - 1].second.first, matchups[Round - 1].second.second, N);
+        vector<int> winpt2 = competitive(matchups[Round - 1].second.first, matchups[Round - 1].second.second, matchups[Round - 1].first.first, matchups[Round - 1].first.second, N);
 
-            	int cnt_b = 0;
+        int cnt_b = 0;
 		int cnt_w = 0;
         for(auto i : winpt){
             if(i == 1){
@@ -703,11 +701,13 @@ void Algorithm(void) {
                 cnt_w++;
             }
         }
+
         fprintf(fp, "BLACK : Breadth(%d), Depth(%d) : %d games win\n", matchups[Round - 1].second.first, matchups[Round - 1].second.second, cnt_b);
         fprintf(fp, "WHITE : Breadth(%d), Depth(%d) : %d games win\n", matchups[Round - 1].first.first, matchups[Round - 1].first.second, cnt_w);
         fprintf(fp, "TIE : %d\n", N - cnt_b - cnt_w);
 		cout << "BLACK : Breadth(" << matchups[Round - 1].second.first << "), Depth(" << matchups[Round - 1].second.second << ") : " << cnt_b << "games win\n";
 		cout << "WHITE : Breadth(" << matchups[Round - 1].first.first << "), Depth(" << matchups[Round - 1].first.second << ") : " << cnt_w << "games win\n";
+
 		cout << "TIE : " << N - cnt_b - cnt_w << "\n";
 
 		cnt_b = 0;
@@ -730,6 +730,7 @@ void Algorithm(void) {
 
 
         fclose(fp);
+
     }
 }
 
