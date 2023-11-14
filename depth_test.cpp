@@ -500,72 +500,6 @@ MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES my
 	}
 	return tmpMax;
 }
-
-int myturn(int cnt) {
-	long st_time = clock();
-	int myBoard[BOARD_ROW][BOARD_COL];
-	for (int i = 0; i < BOARD_ROW; i++) {
-		for (int j = 0; j < BOARD_COL; j++) {
-			myBoard[i][j] = showBoard(i, j);
-		}
-	} // myBoard에 board 상태를 저장
-
-	int x[2], y[2];
-
-	if (cnt == 1) {
-		POSITION myMove = Find_BestSingleMove(myBoard, 1);
-		x[0] = myMove.X;
-		x[1] = -1;
-		y[0] = myMove.Y;
-		y[1] = -1;
-	}
-	else {
-		MOVES_SCORE myMove = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentMyMoves, CurrentOpponentMoves, 1, 30, 0, 7, st_time);
-		x[0] = myMove.first.first.X;
-		x[1] = myMove.first.second.X;
-		y[0] = myMove.first.first.Y;
-		y[1] = myMove.first.second.Y; // 만약 myMove에 불가능한 쌍이 들어왔다면
-
-		if (IsOutOfBounds(x[0], y[0]) || myBoard[x[0]][y[0]] != EMPTY) {
-			bool isFindDone = false;
-			for (int i = 0; i < BOARD_ROW; i++) {
-				for (int j = 0; j < BOARD_COL; j++) {
-					if (myBoard[i][j] == EMPTY && (i != x[1] || j != y[1])) {
-						x[0] = i;
-						y[0] = j;
-						isFindDone = true;
-						break;
-					}
-				}
-				if (isFindDone)
-					break;
-			}
-		}
-		if (IsOutOfBounds(x[1], y[1]) || myBoard[x[1]][y[1]] != EMPTY) {
-			bool isFindDone = false;
-			for (int i = 0; i < BOARD_ROW; i++) {
-				for (int j = 0; j < BOARD_COL; j++) {
-					if (myBoard[i][j] == EMPTY && (i != x[0] || j != y[0])) {
-						x[1] = i;
-						y[1] = j;
-						isFindDone = true;
-						break;
-					}
-				}
-				if (isFindDone)
-					break;
-			}
-		}
-		CurrentMyMoves = { {x[0], y[0]}, {x[1], y[1]} };
-	}
-	// 이 부분에서 자신이 놓을 돌을 출력하십시오.
-	// 필수 함수 : domymove(x배열,y배열,배열크기)
-	// 여기서 배열크기(cnt)는 myturn()의 파라미터 cnt를 그대로 넣어야합니다.
-	domymove(x, y, cnt);
-	
-	return 0;
-}
-
  
 void print_board(int myBoard[][BOARD_COL]) {
     for (int x = 0; x < BOARD_ROW; x++) {
@@ -639,19 +573,13 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
         
         if (winner == BLACK) {
             winpt.push_back(BLACK);
-            winpt.push_back(d2);
-            winpt.push_back(b2);
         }
         else if(winner == WHITE){
             winpt.push_back(WHITE);
-            winpt.push_back(d1);
-            winpt.push_back(b1);
         }
         if (winner == 0) // 무승부이면
             winpt.push_back(0);
     }
- 
-    
     return winpt;
 }
  
@@ -663,18 +591,21 @@ void GeneticAlgorithm(void) {
         FILE* fp = fopen("-", "a");
         fprintf(fp, "============= Round #%d ===========\n", Round);
         printf("============= Round #%d ===========\n", Round);
-        int N = 5; // 흑으로 5판, 백으로 5판
-        vector<int> winpt = competitive(3, 7, 3, 8, N);
-        if(winpt[0] == 1){
-            printf("BLACK ");
-        }
-        else if(winpt[0] == 2){
-            printf("WHITE ");
-        }
-        else {
-            printf("DUCE ");
-        }
-
+        int N = 10; // 흑으로 5판, 백으로 5판
+        
+		vector<int> winpt = competitive(4, 7, 3, 8, N);
+		for(int i : winpt) {
+			if(i == BLACK) {
+            	printf("BLACK ");
+			}
+			else if(i == WHITE) {
+				printf("WHITE ");
+			}
+			else {
+				printf("DUCE ");
+			}
+		}
+		printf("\n");
     }
 }
 
