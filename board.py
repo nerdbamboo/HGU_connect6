@@ -4,6 +4,7 @@ import subprocess
 import json
 import tkinter as tk
 from tkinter import messagebox
+import time
 
 GRID_SIZE = 40
 STONE_SIZE = 36
@@ -23,14 +24,10 @@ black_stone = pygame.image.load("black_stone.png")
 white_stone = pygame.image.load("white_stone.png")
 red_stone = pygame.image.load("red_stone.png")
 
-
-
 size = 40
 black_stone = pygame.transform.scale(black_stone, (size, size))
 white_stone = pygame.transform.scale(white_stone, (size, size))
 red_stone = pygame.transform.scale(red_stone, (size, size))
-
-
 
 stone_list = []
 stone_list.append(red_stone)
@@ -39,9 +36,7 @@ stone_list.append(white_stone)
 
 #상하좌우 여백 크기
 margin = 20
-
 board = [[0 for j in range(19)] for i in range(19)]
-
 
 def get_turn():
     result = {'value': None}  # 딕셔너리를 이용하여 결과를 저장
@@ -94,7 +89,6 @@ def get_block_num():
     custom_box.wait_window()  # 창이 닫힐 때까지 대기
 
     return result['value']
-
 
 def draw_board(screen):
     screen.fill(BROWN)
@@ -187,8 +181,6 @@ def main():
                     red_cnt += 1
         pygame.display.flip()
 
-    
-
     while running:
         
         # Turn for AI    
@@ -243,9 +235,6 @@ def main():
                             opMoveY.append(row-1)
                             cnt += 1
 
-
-
-
         if cnt == 2:
             is_my_ai_turn = not is_my_ai_turn
             cnt = 0
@@ -253,6 +242,7 @@ def main():
         running = check_connect6(board)
         pygame.display.flip()
 
+    time.sleep(5)  # 5초 동안 프로그램 실행을 중지
     pygame.quit()
     sys.exit()
 
