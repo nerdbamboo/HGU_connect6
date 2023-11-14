@@ -463,7 +463,7 @@ vector<MOVES_SCORE> Find_CandidateOfBestDoubleMoves(int myBoard[][BOARD_COL], MO
 }
 
 MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES myMoves, MOVES OpMoves, int player, int Breadth, int currentDepth, int maxDepth, long st_time) {
-	double time_limit = 28;
+	double time_limit = 6.5;
 	MOVES_SCORE tmpMax = { { { -1,-1 },{ -1,-1 } }, -100000000.0 };
 	vector<MOVES_SCORE> candidate = Find_CandidateOfBestDoubleMoves(myboard, myMoves, OpMoves, player, Breadth);
 	if (candidate[0].second < -3000000.0) // 가장 최선인 수 조차 필패일 경우
@@ -522,6 +522,7 @@ int myturn(int cnt) {
 	}
 	else {
 		MOVES_SCORE myMove = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentMyMoves, CurrentOpponentMoves, 1, 30, 0, 7, st_time);
+		printf("%lf\n", myMove.second);
 		x[0] = myMove.first.first.X;
 		x[1] = myMove.first.second.X;
 		y[0] = myMove.first.first.Y;

@@ -197,6 +197,8 @@ def main():
             result = subprocess.run(['./play'], input=input_data.encode(), stdout=subprocess.PIPE)
 
             output = result.stdout.decode().strip().split()
+            print(output[0])
+            output.pop(0)
             print(output)
             
             row = float(output[0])
