@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <tuple>
 #include <time.h>
+#include <random>
+#include <bits/stdc++.h>
 
 using namespace std;
 typedef pair<int, int> POSITION;
@@ -503,7 +505,6 @@ MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES my
 	return tmpMax;
 }
 
-
 int check_connect6(int board[][19]) {
     // 바둑판의 크기
     int width = 19;
@@ -550,8 +551,6 @@ int check_connect6(int board[][19]) {
     return 0;
 }
 
-
- 
 void print_board(int myBoard[][BOARD_COL]) {
     for (int x = 0; x < BOARD_ROW; x++) {
         for (int y = 0; y < BOARD_COL; y++) {
@@ -561,8 +560,8 @@ void print_board(int myBoard[][BOARD_COL]) {
     }
     printf("\n");
 }
+
 vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 흑을 잡고 N번 경기했을 때 이긴 횟수
-    //00010203040506070809101112131415161718
     vector<int> winpt; // 이기면 2, 비기면 1, 지면 0점을 더한 후 2로 나눌 계획
     for (int comp = 0; comp < N; comp++) {
         int myBoard[BOARD_ROW][BOARD_COL] = {
@@ -586,6 +585,19 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
             { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 17
             { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }  // ROW 18
         };
+		
+		random_device rd;  //Will be used to obtain a seed for the random number engine
+        mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+        uniform_int_distribution<> dis(0, 18);
+        int stuckNum = 2; // 장애물은 6개
+        while (stuckNum) {
+            int stuck_x = dis(gen);
+            int stuck_y = dis(gen);
+            if (myBoard[stuck_x][stuck_y] == EMPTY) {
+                myBoard[stuck_x][stuck_y] = BLOCK;
+                stuckNum--;
+            }
+        }  // 장애물 설치 완료
 
         POSITION myMove = Find_BestSingleMove(myBoard, BLACK); // 흑이 먼저 착수
         myBoard[myMove.X][myMove.Y] = BLACK;
@@ -602,7 +614,7 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
                 myBoard[t.first.first.X][t.first.first.Y] = WHITE;
                 myBoard[t.first.second.X][t.first.second.Y] = WHITE;
                 CurrentWhiteMoves = t.first;
-                printf("W: [%d, %d], [%d, %d], [%lf]\n", t.first.first.X, t.first.first.Y, t.first.second.X, t.first.second.Y, t.second);
+                // printf("W: [%d, %d], [%d, %d], [%lf]\n", t.first.first.X, t.first.first.Y, t.first.second.X, t.first.second.Y, t.second);
                 // if (t.second >= 500000) {
                 //     winner = WHITE;
                 //     print_board(myBoard);
@@ -616,7 +628,7 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
                 myBoard[t.first.first.X][t.first.first.Y] = BLACK;
                 myBoard[t.first.second.X][t.first.second.Y] = BLACK;
                 CurrentBlackMoves = t.first;
-                printf("B: [%d, %d], [%d, %d], [%lf]\n", t.first.first.X, t.first.first.Y, t.first.second.X, t.first.second.Y, t.second);
+                // printf("B: [%d, %d], [%d, %d], [%lf]\n", t.first.first.X, t.first.first.Y, t.first.second.X, t.first.second.Y, t.second);
                 // if (t.second >= 500000) {
                 //     winner = BLACK;
                 //     print_board(myBoard);
@@ -627,12 +639,12 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
             int check = check_connect6(myBoard);
             if(check == 2){
                 winner = WHITE;
-                print_board(myBoard);
+                // print_board(myBoard);
                 break;
             }
             else if(check == 1){
                 winner = BLACK;
-                print_board(myBoard);
+                // print_board(myBoard);
                 break;
             }
         }
@@ -655,38 +667,43 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
 
 void GeneticAlgorithm(void) {
     const int FACTOR_NUM = 16;
+	
+	int b1 = 4, d1 = 6;
+	int b2 = 3, d2 = 7;
 
     for (int Round = 1; Round < 2 ; Round++) {
-        FILE* fp = fopen("-", "a");
-        fprintf(fp, "============= Round #%d ===========\n", Round);
         printf("============= Round #%d ===========\n", Round);
-        int N = 2; // 흑으로 5판, 백으로 5판
-        vector<int> winpt = competitive(5, 5, 3, 7, N);
-        vector<int> winpt2 = competitive(3, 7, 5, 5, N);
+        int N = 1; // 흑으로 5판, 백으로 5판
+        vector<int> winpt = competitive(b1, d1, b2, d2, N);
+        vector<int> winpt2 = competitive(b2, d2, b1, d1, N);
+
+		int cnt_b = 0;
+		int cnt_w = 0;
         for(auto i : winpt){
             if(i == 1){
-                printf("BLACK ");
+                cnt_b++;
             }
             else if(i == 2){
-                printf("WHITE ");
-            }
-            else {
-                printf("TIE ");
+                cnt_w++;
             }
         }
+		cout << "BLACK : Breadth(" << b1 << "), Depth(" << d1 << ") : " << cnt_b << "games win\n";
+		cout << "WHITE : Breadth(" << b2 << "), Depth(" << d2 << ") : " << cnt_w << "games win\n";
+		cout << "TIE : " << N - cnt_b - cnt_w << "\n";
 
+		cnt_b = 0;
+		cnt_w = 0;
         for(auto i : winpt2){
             if(i == 1){
-                printf("BLACK ");
+                cnt_b++;
             }
             else if(i == 2){
-                printf("WHITE ");
+                cnt_w++;
             }
-            else {
-                printf("TIE ");
-            }
-        }
-
+		}
+		cout << "BLACK : Breadth(" << b2 << "), Depth(" << d2 << ") : " << cnt_b << " games win\n";
+		cout << "WHITE : Breadth(" << b1 << "), Depth(" << d1 << ") : " << cnt_w << " games win\n";
+		cout << "TIE : " << N - cnt_b - cnt_w << "\n";
     }
 }
 
