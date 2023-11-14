@@ -1,5 +1,4 @@
 #include <stdio.h>
-//#include <Windows.h>
 #include <time.h>
 #include <vector>
 #include <algorithm>
@@ -565,4 +564,115 @@ int myturn(int cnt) {
 	domymove(x, y, cnt);
 	
 	return 0;
+}
+
+ 
+void print_board(int myBoard[][BOARD_COL]) {
+    for (int x = 0; x < BOARD_ROW; x++) {
+        for (int y = 0; y < BOARD_COL; y++) {
+            printf("%d ", myBoard[x][y]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+int competitive(int breadth, int depth, int N) { // f1과 f2이 흑을 잡고 N번 경기했을 때 이긴 횟수
+    //00010203040506070809101112131415161718
+    int winpt = 0; // 이기면 2, 비기면 1, 지면 0점을 더한 후 2로 나눌 계획
+    for (int comp = 0; comp < N; comp++) {
+        int myBoard[BOARD_ROW][BOARD_COL] = {
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 0
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 1
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 2
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 3
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 4
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 5
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 6
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 7
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 8
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 9
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 10
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 11
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 12
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 13
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 14
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 15
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 16
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // ROW 17
+            { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }  // ROW 18
+        };
+        random_device rd;  //Will be used to obtain a seed for the random number engine
+        mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+        uniform_int_distribution<> dis(0, 18);
+        int stuckNum = 6; // 장애물은 6개
+        while (stuckNum) {
+            int stuck_x = dis(gen);
+            int stuck_y = dis(gen);
+            if (myBoard[stuck_x][stuck_y] == EMPTY) {
+                myBoard[stuck_x][stuck_y] = BLOCK;
+                stuckNum--;
+            }
+        }  // 장애물 설치 완료
+        POSITION myMove = Find_BestSingleMove(myBoard, f1, BLACK); // 흑이 먼저 착수
+        myBoard[myMove.X][myMove.Y] = BLACK;
+        int CurrentPlayer = WHITE;
+        int winner = 0;
+        MOVES CurrentWhiteMoves = { {-1, -1}, {-1, -1} };
+        MOVES CurrentBlackMoves = { { -1, -1 },{ -1, -1 } };
+        for (int tmp_cnt = 0; tmp_cnt < 170; tmp_cnt++) { // 170수를 둘 때 까지만 진행. 더 넘어가면 그냥 무승부라고 볼 것임
+            if (CurrentPlayer == WHITE) { // 백의 차례이면
+                int st_time = clock();
+                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentWhiteMoves, CurrentBlackMoves, f2, WHITE, 2, 0, 2, st_time);
+                myBoard[t.first.first.X][t.first.first.Y] = WHITE;
+                myBoard[t.first.second.X][t.first.second.Y] = WHITE;
+                CurrentWhiteMoves = t.first;
+                if (t.second >= 50000) {
+                    winner = WHITE;
+                    break;
+                }
+                CurrentPlayer = BLACK;
+            }
+            else { // 흑의 차례이면
+                int st_time = clock();
+                MOVES_SCORE t = Find_BestDoubleMovesByDepthSearch(myBoard, CurrentBlackMoves, CurrentWhiteMoves, f1, BLACK, 2, 0, 2, st_time);
+                myBoard[t.first.first.X][t.first.first.Y] = BLACK;
+                myBoard[t.first.second.X][t.first.second.Y] = BLACK;
+                CurrentBlackMoves = t.first;
+                if (t.second >= 50000) {
+                    winner = BLACK;
+                    break;
+                }
+                CurrentPlayer = WHITE;
+            }
+        }
+        if (winner == BLACK) // f1이 이겼으면
+            winpt += 2;
+        if (winner == 0) // 무승부이면
+            winpt += 1;
+    }
+ 
+    
+    return winpt;
+}
+ 
+
+void GeneticAlgorithm(void) {
+    const int FACTOR_NUM = 16;
+
+    for (int Round = 1; Round < 2 ; Round++) {
+        FILE* fp = fopen("-", "a");
+        fprintf(fp, "============= Round #%d ===========\n", Round);
+        printf("============= Round #%d ===========\n", Round);
+ 
+        for (int i = 0; i < FACTOR_NUM; i++) {
+            for (int j = i + 1; j < FACTOR_NUM; j++) {
+                int N = 5; // 흑으로 5판, 백으로 5판
+                int winpt = competitive(3, 7, N) + (2 * N - competitive(4, 8, N));
+            }
+        }
+    }
+}
+
+int main(void) {    
+    GeneticAlgorithm();    
 }
