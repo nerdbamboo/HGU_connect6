@@ -465,7 +465,7 @@ vector<MOVES_SCORE> Find_CandidateOfBestDoubleMoves(int myBoard[][BOARD_COL], MO
 }
 
 MOVES_SCORE Find_BestDoubleMovesByDepthSearch(int myboard[][BOARD_COL], MOVES myMoves, MOVES OpMoves, int player, int Breadth, int currentDepth, int maxDepth, long st_time) {
-	double time_limit = 7;
+	double time_limit = 25;
 	MOVES_SCORE tmpMax = { { { -1,-1 },{ -1,-1 } }, -100000000.0 };
 	vector<MOVES_SCORE> candidate = Find_CandidateOfBestDoubleMoves(myboard, myMoves, OpMoves, player, Breadth + 25);
     //printf("%d, %lf, %lf\n", player, candidate[0].second, candidate[1].second);
@@ -596,7 +596,7 @@ vector<int> competitive(int b1, int d1, int b2, int d2, int N) { // f1과 f2이 
 		random_device rd;  //Will be used to obtain a seed for the random number engine
         mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
         uniform_int_distribution<> dis(0, 18);
-        int stuckNum = 2; // 장애물은 6개
+        int stuckNum = 4; // 장애물은 6개
         while (stuckNum) {
             int stuck_x = dis(gen);
             int stuck_y = dis(gen);
@@ -686,7 +686,7 @@ void Algorithm(void) {
         fprintf(fp, "============= Round #%d ===========\n%d %d vs %d %d\n", Round, matchups[Round - 1].first.first, matchups[Round - 1].first.second, matchups[Round - 1].second.first, matchups[Round - 1].second.second);
         printf("============= Round #%d ===========\n", Round);
 
-        int N = 5; // 흑으로 5판, 백으로 5판
+        int N = 20; // 흑으로 5판, 백으로 5판
 
         vector<int> winpt = competitive(matchups[Round - 1].first.first, matchups[Round - 1].first.second, matchups[Round - 1].second.first, matchups[Round - 1].second.second, N);
         vector<int> winpt2 = competitive(matchups[Round - 1].second.first, matchups[Round - 1].second.second, matchups[Round - 1].first.first, matchups[Round - 1].first.second, N);
